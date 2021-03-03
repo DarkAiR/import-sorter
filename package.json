@@ -1,16 +1,16 @@
 {
     "name": "import-sorter",
     "displayName": "TypeScript Import Sorter",
-    "description": "Extension sorts TypeScript imports according to the configuration provided. The configuration defaults follow ESLint sort-imports rule",
+    "description": "Extension sorts TypeScript imports according to the configuration provided. The configuration defaults follow ESLint sort-imports rule. Based on SoominHan/import-sorter",
     "icon": "assets/icons/import-sorter.png",
-    "version": "3.3.1",
-    "publisher": "mike-co",
+    "version": "4.0.0",
+    "publisher": "maikudou",
     "engines": {
         "vscode": "^1.33.0"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/SoominHan/import-sorter.git"
+        "url": "https://github.com/maikudou/import-sorter.git"
     },
     "license": "SEE LICENSE IN LICENSE",
     "categories": [
@@ -39,7 +39,8 @@
         "postinstall": "./after-install.sh",
         "test": "npm run compile && node ./node_modules/vscode/bin/test",
         "clean": "rimraf -- node_modules coverage out",
-        "lint": "tslint src/**/*.ts"
+        "lint": "tslint src/**/*.ts",
+        "rollup": "npx rollup --config"
     },
     "bin": {
         "import-sorter-cli": "./bin/cli.js"
@@ -57,6 +58,9 @@
         "@types/node": "^8.10.25",
         "expect.js": "^0.3.1",
         "mocha": "^8.3.0",
+        "rollup": "^2.40.0",
+        "rollup-plugin-commonjs": "^10.1.0",
+        "rollup-plugin-typescript": "^1.0.1",
         "tslint": "^5.8.0",
         "vscode": "^1.1.21",
         "vscode-nls": "^2.0.2"

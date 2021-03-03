@@ -81,8 +81,10 @@ export class CLIConfigurationProvider implements ConfigurationProvider {
     }
 
     private _getDefaultConfiguration(): ImportSorterConfiguration {
-        const fileConfigJsonObj = require(resolve(__filename, '../../../package.json')).contributes
-            .configuration.properties;
+        const packageConfigPath = this._findPackageConfigPath();
+        const fileConfigJsonObj = packageConfigPath
+            ? require(this._findPackageConfigPath()).contributes.configuration.properties
+            : {};
         const fileConfigMerged = this._parseConfig(fileConfigJsonObj);
 
         return {
@@ -158,6 +160,21 @@ export class CLIConfigurationProvider implements ConfigurationProvider {
             currentPath = resolve(path, '../'.repeat(depth++));
         }
         return exists ? prettierPath : null;
+    }
+
+    private _findPackageConfigPath(): string | null {
+        const homeDir = homedir();
+        let depth = 1;
+        let currentPath = __filename;
+        let packagePath: string;
+        let exists = false;
+
+        while (!exists && depth < 100 && currentPath !== homeDir) {
+            packagePath = resolve(currentPath, './package.json');
+            exists = existsSync(packagePath);
+            currentPath = resolve(__filename, '../'.repeat(depth++));
+        }
+        return exists ? packagePath : null;
     }
 }
 
