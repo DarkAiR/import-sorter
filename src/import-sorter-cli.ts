@@ -207,7 +207,6 @@ export class ImportSorterCLI {
                                 console.log(`${filePath} saved`);
                             });
                     } else {
-                        console.log(`${filePath} already sorted`);
                         return EMPTY;
                     }
                 }),

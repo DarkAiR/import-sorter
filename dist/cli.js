@@ -1134,7 +1134,6 @@ class ImportSorterCLI {
                 });
             }
             else {
-                console.log(`${filePath} already sorted`);
                 return rxjs.EMPTY;
             }
         }), operators.mapTo(void 0))
