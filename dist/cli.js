@@ -1051,7 +1051,6 @@ class CLIConfigurationProvider {
                     });
                 })
                     .then((path) => {
-                    console.log(path);
                     return readFile$(path)
                         .pipe(operators.map((content) => JSON.parse(content)))
                         .toPromise();
@@ -1128,7 +1127,11 @@ class ImportSorterCLI {
             const result = this.importRunner.getSortImportData(filePath, content);
             if (result.isSortRequired) {
                 console.log(`${filePath} needs to be sorted, sorting...`);
-                return writeFile$(filePath, this.getFullSortedSourceFile(content, result));
+                return writeFile$(filePath, this.getFullSortedSourceFile(content, result))
+                    .toPromise()
+                    .then(() => {
+                    console.log(`${filePath} saved`);
+                });
             }
             else {
                 console.log(`${filePath} already sorted`);
@@ -1136,9 +1139,6 @@ class ImportSorterCLI {
             }
         }), operators.mapTo(void 0))
             .toPromise()
-            .then(() => {
-            console.log('saved');
-        })
             .catch(console.log);
     }
     sortImportsInDirectory(dirPath) {

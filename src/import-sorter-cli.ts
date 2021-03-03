@@ -106,7 +106,6 @@ export class CLIConfigurationProvider implements ConfigurationProvider {
                   );
               })
                   .then((path: string) => {
-                      console.log(path);
                       return readFile$(path)
                           .pipe(map((content: string) => JSON.parse(content)))
                           .toPromise();
@@ -202,7 +201,11 @@ export class ImportSorterCLI {
                     );
                     if (result.isSortRequired) {
                         console.log(`${filePath} needs to be sorted, sorting...`);
-                        return writeFile$(filePath, this.getFullSortedSourceFile(content, result));
+                        return writeFile$(filePath, this.getFullSortedSourceFile(content, result))
+                            .toPromise()
+                            .then(() => {
+                                console.log(`${filePath} saved`);
+                            });
                     } else {
                         console.log(`${filePath} already sorted`);
                         return EMPTY;
@@ -211,9 +214,6 @@ export class ImportSorterCLI {
                 mapTo(void 0)
             )
             .toPromise()
-            .then(() => {
-                console.log('saved');
-            })
             .catch(console.log);
     }
 
