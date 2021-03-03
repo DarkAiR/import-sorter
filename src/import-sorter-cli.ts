@@ -200,11 +200,10 @@ export class ImportSorterCLI {
                         content
                     );
                     if (result.isSortRequired) {
-                        console.log(`${filePath} needs to be sorted, sorting...`);
                         return writeFile$(filePath, this.getFullSortedSourceFile(content, result))
                             .toPromise()
                             .then(() => {
-                                console.log(`${filePath} saved`);
+                                console.log(`${filePath} sorted`);
                             });
                     } else {
                         return EMPTY;

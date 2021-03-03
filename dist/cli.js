@@ -8,29 +8,6 @@ var rxjs = require('rxjs');
 var operators = require('rxjs/operators');
 var os = require('os');
 var ts = require('typescript');
-var glob = require('glob');
-
-function _interopNamespace(e) {
-    if (e && e.__esModule) return e;
-    var n = Object.create(null);
-    if (e) {
-        Object.keys(e).forEach(function (k) {
-            if (k !== 'default') {
-                var d = Object.getOwnPropertyDescriptor(e, k);
-                Object.defineProperty(n, k, d.get ? d : {
-                    enumerable: true,
-                    get: function () {
-                        return e[k];
-                    }
-                });
-            }
-        });
-    }
-    n['default'] = e;
-    return Object.freeze(n);
-}
-
-var glob__namespace = /*#__PURE__*/_interopNamespace(glob);
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -83,6 +60,7 @@ class LineRange {
     }
 }
 
+const glob = require('glob');
 function readFile$(filePath, encoding = 'utf-8') {
     return rxjs.Observable.create((observer) => {
         fs.readFile(filePath, encoding, (error, data) => {
@@ -114,7 +92,7 @@ function getFullPath(srcPath, filename) {
 }
 function filePaths$(startingSourcePath, pattern, ignore) {
     return rxjs.Observable.create((observer) => {
-        glob__namespace(pattern, {
+        glob(pattern, {
             cwd: startingSourcePath,
             ignore,
             nodir: true
@@ -123,7 +101,7 @@ function filePaths$(startingSourcePath, pattern, ignore) {
                 observer.error(error);
             }
             else {
-                const fullPaths = matches.map(filePath => getFullPath(startingSourcePath, filePath));
+                const fullPaths = matches.map((filePath) => getFullPath(startingSourcePath, filePath));
                 observer.next(fullPaths);
                 observer.complete();
             }
@@ -1126,11 +1104,10 @@ class ImportSorterCLI {
             .pipe(operators.concatMap((content) => {
             const result = this.importRunner.getSortImportData(filePath, content);
             if (result.isSortRequired) {
-                console.log(`${filePath} needs to be sorted, sorting...`);
                 return writeFile$(filePath, this.getFullSortedSourceFile(content, result))
                     .toPromise()
                     .then(() => {
-                    console.log(`${filePath} saved`);
+                    console.log(`${filePath} sorted`);
                 });
             }
             else {
