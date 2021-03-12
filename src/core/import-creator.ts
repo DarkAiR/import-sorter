@@ -1,7 +1,9 @@
 import { chain, LoDashExplicitArrayWrapper } from 'lodash';
 
 import {
-    ImportElement, ImportElementGroup, ImportStringConfiguration
+    ImportElement,
+    ImportElementGroup,
+    ImportStringConfiguration
 } from './models/models-public';
 
 export interface ImportCreator {
@@ -19,25 +21,30 @@ export class InMemoryImportCreator implements ImportCreator {
     public createImportText(groups: ImportElementGroup[]): string {
         this.assertIsInitialised();
         const importLines: string[] = [];
-        groups
-            .forEach((x, i, data) => {
-                const importStrings = this.createImportStrings(x.elements);
-                const line = importStrings.imports.join('\n') +
-                    this.repeatString('\n', i !== data.length - 1 ? x.numberOfEmptyLinesAfterGroup : 0);
-                importLines.push(line);
-                importLines.unshift(...importStrings.tripleSlashDirectives);
-            });
-        return importLines.join('\n') + this.repeatString('\n', this.importStringConfig.numberOfEmptyLinesAfterAllImports);
+        groups.forEach((x, i, data) => {
+            const importStrings = this.createImportStrings(x.elements);
+            const line =
+                importStrings.imports.join('\n') +
+                this.repeatString('\n', i !== data.length - 1 ? x.numberOfEmptyLinesAfterGroup : 0);
+            importLines.push(line);
+            importLines.unshift(...importStrings.tripleSlashDirectives);
+        });
+        return (
+            importLines.join('\n') +
+            this.repeatString('\n', this.importStringConfig.numberOfEmptyLinesAfterAllImports)
+        );
     }
 
-    private createImportStrings(element: ImportElement[]): { imports: string[], tripleSlashDirectives: string[] } {
+    private createImportStrings(
+        element: ImportElement[]
+    ): { imports: string[]; tripleSlashDirectives: string[] } {
         this.assertIsInitialised();
         const tripleSlashDirectives: string[] = [];
-        const imports =  element.map(x => {
+        const imports = element.map((x) => {
             const importString = this.createSingleImportString(x);
 
             const leadingComments: string[] = [];
-            x.importComment.leadingComments.forEach(comment => {
+            x.importComment.leadingComments.forEach((comment) => {
                 if (!comment.isTripleSlashDirective) {
                     leadingComments.push(comment.text);
                 } else {
@@ -45,10 +52,12 @@ export class InMemoryImportCreator implements ImportCreator {
                 }
             });
             let leadingCommentText = leadingComments.join('\n');
-            leadingCommentText = leadingCommentText ? leadingCommentText + '\n' : leadingCommentText;
+            leadingCommentText = leadingCommentText
+                ? leadingCommentText + '\n'
+                : leadingCommentText;
 
             const trailingComments: string[] = [];
-            x.importComment.trailingComments.forEach(comment => {
+            x.importComment.trailingComments.forEach((comment) => {
                 if (!comment.isTripleSlashDirective) {
                     trailingComments.push(comment.text);
                 } else {
@@ -56,12 +65,14 @@ export class InMemoryImportCreator implements ImportCreator {
                 }
             });
             let trailingCommentText = trailingComments.join('\n');
-            trailingCommentText = trailingCommentText ? ' ' + trailingCommentText : trailingCommentText;
+            trailingCommentText = trailingCommentText
+                ? ' ' + trailingCommentText
+                : trailingCommentText;
 
             const importWithComments = leadingCommentText + importString + trailingCommentText;
             return importWithComments;
         });
-        return ({ imports, tripleSlashDirectives });
+        return { imports, tripleSlashDirectives };
     }
 
     private assertIsInitialised() {
@@ -72,12 +83,13 @@ export class InMemoryImportCreator implements ImportCreator {
 
     private createSingleImportString(element: ImportElement) {
         const qMark = this.getQuoteMark();
+        const typeOnly = element.isTypeOnly ? 'type ' : '';
         if (!element.hasFromKeyWord) {
-            return `import ${qMark}${element.moduleSpecifierName}${qMark}${this.semicolonChar}`;
+            return `import ${typeOnly}${qMark}${element.moduleSpecifierName}${qMark}${this.semicolonChar}`;
         }
 
         if (element.namedBindings && element.namedBindings.length > 0) {
-            const isStarImport = element.namedBindings.some(x => x.name === '*');
+            const isStarImport = element.namedBindings.some((x) => x.name === '*');
             if (isStarImport) {
                 return this.createStarImport(element);
             }
@@ -89,45 +101,38 @@ export class InMemoryImportCreator implements ImportCreator {
             );
         }
         if (element.defaultImportName) {
-            return `import ${element.defaultImportName} from ${qMark}${element.moduleSpecifierName}${qMark}${
-                this.semicolonChar
-                }`;
+            return `import ${typeOnly}${element.defaultImportName} from ${qMark}${element.moduleSpecifierName}${qMark}${this.semicolonChar}`;
         } else {
-            return `import {} from ${qMark}${element.moduleSpecifierName}${qMark}${this.semicolonChar}`;
+            return `import ${typeOnly}{} from ${qMark}${element.moduleSpecifierName}${qMark}${this.semicolonChar}`;
         }
     }
 
     private createStarImport(element: ImportElement) {
         const qMark = this.getQuoteMark();
         const spaceConfig = this.getSpaceConfig();
+        const typeOnly = element.isTypeOnly ? 'type ' : '';
         if (element.defaultImportName) {
             // tslint:disable-next-line:max-line-length
-            return `import ${element.defaultImportName}${spaceConfig.beforeComma},${spaceConfig.afterComma}${
-                element.namedBindings[0].name
-                } as ${element.namedBindings[0].aliasName} from ${qMark}${element.moduleSpecifierName}${qMark}${
-                this.semicolonChar
-                }`;
+            return `import ${typeOnly}${element.defaultImportName}${spaceConfig.beforeComma},${spaceConfig.afterComma}${element.namedBindings[0].name} as ${element.namedBindings[0].aliasName} from ${qMark}${element.moduleSpecifierName}${qMark}${this.semicolonChar}`;
         } else {
-            return `import ${element.namedBindings[0].name} as ${element.namedBindings[0].aliasName} from ${qMark}${
-                element.moduleSpecifierName
-                }${qMark}${this.semicolonChar}`;
+            return `import ${typeOnly}${element.namedBindings[0].name} as ${element.namedBindings[0].aliasName} from ${qMark}${element.moduleSpecifierName}${qMark}${this.semicolonChar}`;
         }
     }
 
     private createCurlyBracketElement(element: ImportElement) {
         const spaceConfig = this.getSpaceConfig();
-        const nameBindingStringsExpr = chain(element.namedBindings).map(
-            x => (x.aliasName ? `${x.name} as ${x.aliasName}` : x.name)
+        const nameBindingStringsExpr = chain(element.namedBindings).map((x) =>
+            x.aliasName ? `${x.name} as ${x.aliasName}` : x.name
         );
         const resultingChunks = this.createNameBindingChunks(nameBindingStringsExpr, element);
         return resultingChunks.isSingleLine
             ? { line: `${resultingChunks.nameBindings[0]}`, isSingleLine: true }
             : {
-                line: `${spaceConfig.tabSequence}${resultingChunks.nameBindings.join(
-                    `,\n${spaceConfig.tabSequence}`
-                )}`,
-                isSingleLine: false
-            };
+                  line: `${spaceConfig.tabSequence}${resultingChunks.nameBindings.join(
+                      `,\n${spaceConfig.tabSequence}`
+                  )}`,
+                  isSingleLine: false
+              };
     }
 
     private createNameBindingChunks(
@@ -160,7 +165,7 @@ export class InMemoryImportCreator implements ImportCreator {
         const beforeCommaAndAfterPart = `${spaceConfig.beforeComma},${spaceConfig.afterComma}`;
         const nameBindingsResult = chain(nameBindings)
             .chunk(maximumNumberOfWordsBeforeBreak || 1)
-            .map(x => x.join(beforeCommaAndAfterPart))
+            .map((x) => x.join(beforeCommaAndAfterPart))
             .value();
 
         const isSingleLine = nameBindings.length <= maximumNumberOfWordsBeforeBreak;
@@ -183,7 +188,11 @@ export class InMemoryImportCreator implements ImportCreator {
         const spaceConfig = this.getSpaceConfig();
         const beforeCommaAndAfterPart = `${spaceConfig.beforeComma},${spaceConfig.afterComma}`;
         const insideCurlyString = nameBindings.join(beforeCommaAndAfterPart);
-        const singleLineImport = this.createImportWithCurlyBracket(element, insideCurlyString, true);
+        const singleLineImport = this.createImportWithCurlyBracket(
+            element,
+            insideCurlyString,
+            true
+        );
         const isSingleLine =
             this.importStringConfig.trailingComma === 'always'
                 ? singleLineImport.length < max
@@ -228,7 +237,9 @@ export class InMemoryImportCreator implements ImportCreator {
 
             //if we have first element in chunk then we need to consider after comma spaces
             currentTotalLength = result[resultIndex]
-                ? xLength + currentTotalLength + this.importStringConfig.spacingPerImportExpression.afterComma
+                ? xLength +
+                  currentTotalLength +
+                  this.importStringConfig.spacingPerImportExpression.afterComma
                 : xLength + currentTotalLength;
 
             if (currentTotalLength <= maxLineLength) {
@@ -246,7 +257,7 @@ export class InMemoryImportCreator implements ImportCreator {
             }
         });
         return {
-            nameBindings: result.map(x => x.join(beforeCommaAndAfterPart)),
+            nameBindings: result.map((x) => x.join(beforeCommaAndAfterPart)),
             isSingleLine: false
         };
     }
@@ -261,32 +272,25 @@ export class InMemoryImportCreator implements ImportCreator {
         }
     }
 
-    private createImportWithCurlyBracket(element: ImportElement, namedBindingString: string, isSingleLine: boolean) {
+    private createImportWithCurlyBracket(
+        element: ImportElement,
+        namedBindingString: string,
+        isSingleLine: boolean
+    ) {
         const qMark = this.getQuoteMark();
         const spaceConfig = this.getSpaceConfig();
+        const typeOnly = element.isTypeOnly ? 'type ' : '';
         if (element.defaultImportName) {
             return isSingleLine
                 ? // tslint:disable-next-line:max-line-length
-                `import ${element.defaultImportName}${spaceConfig.beforeComma},${spaceConfig.afterComma}{${
-                spaceConfig.afterStartingBracket
-                }${namedBindingString}${spaceConfig.beforeEndingBracket}} from ${qMark}${
-                element.moduleSpecifierName
-                }${qMark}${this.semicolonChar}`
+                  `import ${typeOnly}${element.defaultImportName}${spaceConfig.beforeComma},${spaceConfig.afterComma}{${spaceConfig.afterStartingBracket}${namedBindingString}${spaceConfig.beforeEndingBracket}} from ${qMark}${element.moduleSpecifierName}${qMark}${this.semicolonChar}`
                 : // tslint:disable-next-line:max-line-length
-                `import ${element.defaultImportName}${spaceConfig.beforeComma},${
-                spaceConfig.afterComma
-                }{\n${namedBindingString}\n} from ${qMark}${element.moduleSpecifierName}${qMark}${
-                this.semicolonChar
-                }`;
+                  `import ${typeOnly}${element.defaultImportName}${spaceConfig.beforeComma},${spaceConfig.afterComma}{\n${namedBindingString}\n} from ${qMark}${element.moduleSpecifierName}${qMark}${this.semicolonChar}`;
         }
         return isSingleLine
             ? // tslint:disable-next-line:max-line-length
-            `import {${spaceConfig.afterStartingBracket}${namedBindingString}${
-            spaceConfig.beforeEndingBracket
-            }} from ${qMark}${element.moduleSpecifierName}${qMark}${this.semicolonChar}`
-            : `import {\n${namedBindingString}\n} from ${qMark}${element.moduleSpecifierName}${qMark}${
-            this.semicolonChar
-            }`;
+              `import ${typeOnly}{${spaceConfig.afterStartingBracket}${namedBindingString}${spaceConfig.beforeEndingBracket}} from ${qMark}${element.moduleSpecifierName}${qMark}${this.semicolonChar}`
+            : `import ${typeOnly}{\n${namedBindingString}\n} from ${qMark}${element.moduleSpecifierName}${qMark}${this.semicolonChar}`;
     }
 
     private getSpaceConfig() {
@@ -295,8 +299,14 @@ export class InMemoryImportCreator implements ImportCreator {
                 ? this.repeatString('\t', 1)
                 : this.repeatString(' ', this.importStringConfig.tabSize);
         return {
-            beforeComma: this.repeatString(' ', this.importStringConfig.spacingPerImportExpression.beforeComma),
-            afterComma: this.repeatString(' ', this.importStringConfig.spacingPerImportExpression.afterComma),
+            beforeComma: this.repeatString(
+                ' ',
+                this.importStringConfig.spacingPerImportExpression.beforeComma
+            ),
+            afterComma: this.repeatString(
+                ' ',
+                this.importStringConfig.spacingPerImportExpression.afterComma
+            ),
             afterStartingBracket: this.repeatString(
                 ' ',
                 this.importStringConfig.spacingPerImportExpression.afterStartingBracket

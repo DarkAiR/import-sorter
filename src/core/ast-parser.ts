@@ -8,7 +8,6 @@ export interface AstParser {
 }
 
 export class SimpleImportAstParser implements AstParser {
-
     public parseImports(fullFilePath: string, _sourceText?: string): ParsedImportValues {
         if (_sourceText !== null && _sourceText !== undefined && _sourceText.trim() === '') {
             return { importElements: [], usedTypeReferences: [], firstImportLineNumber: null };
@@ -18,9 +17,14 @@ export class SimpleImportAstParser implements AstParser {
         const importsAndTypes = this.delintImportsAndTypes(sourceFile, sourceText);
         this.updateFirstNodeLeadingComments(importsAndTypes.importNodes, sourceText);
         return {
-            importElements: importsAndTypes.importNodes.map(x => this.parseImport(x, sourceFile)).filter(x => x !== null),
+            importElements: importsAndTypes.importNodes
+                .map((x) => this.parseImport(x, sourceFile))
+                .filter((x) => x !== null),
             usedTypeReferences: importsAndTypes.usedTypeReferences,
-            firstImportLineNumber: this.firstImportLineNumber(importsAndTypes.importNodes[0], sourceText)
+            firstImportLineNumber: this.firstImportLineNumber(
+                importsAndTypes.importNodes[0],
+                sourceText
+            )
         };
     }
 
@@ -33,7 +37,8 @@ export class SimpleImportAstParser implements AstParser {
             return;
         }
         const lastLeadingComment = this.getLastLeadingComment(firstNode);
-        const leadingCommentNextLine = textProcessing.getPositionByOffset(lastLeadingComment.range.end, text).line + 1;
+        const leadingCommentNextLine =
+            textProcessing.getPositionByOffset(lastLeadingComment.range.end, text).line + 1;
         if (firstNode.start.line - leadingCommentNextLine >= 1) {
             //if we have leading comments, and there is at least one line which separates them from import, then we do not consider it
             //to be a leading comment belonging to node
@@ -42,11 +47,12 @@ export class SimpleImportAstParser implements AstParser {
             //if we have leading comments then only take the last one;
             firstNode.importComment.leadingComments = [lastLeadingComment];
         }
-
     }
 
     private firstImportLineNumber(importNode: ImportNode, text: string) {
-        if (!importNode) { return null; }
+        if (!importNode) {
+            return null;
+        }
 
         const leadingComments = this.getLastLeadingComment(importNode);
         if (leadingComments) {
@@ -56,16 +62,25 @@ export class SimpleImportAstParser implements AstParser {
     }
 
     private getLastLeadingComment(importNode: ImportNode): Comment {
-        if (!importNode) { return null; }
-        return importNode.importComment.leadingComments && importNode.importComment.leadingComments.length ?
-            importNode.importComment.leadingComments[importNode.importComment.leadingComments.length - 1] : null;
+        if (!importNode) {
+            return null;
+        }
+        return importNode.importComment.leadingComments &&
+            importNode.importComment.leadingComments.length
+            ? importNode.importComment.leadingComments[
+                  importNode.importComment.leadingComments.length - 1
+              ]
+            : null;
     }
 
     private createSourceFile(fullFilePath: string, sourceText: string) {
         return ts.createSourceFile(fullFilePath, sourceText, ts.ScriptTarget.Latest, false);
     }
 
-    private delintImportsAndTypes(sourceFile: ts.SourceFile, sourceText?: string): { importNodes: ImportNode[], usedTypeReferences: string[] } {
+    private delintImportsAndTypes(
+        sourceFile: ts.SourceFile,
+        sourceText?: string
+    ): { importNodes: ImportNode[]; usedTypeReferences: string[] } {
         const importNodes: ImportNode[] = [];
         const usedTypeReferences: string[] = [];
         const sourceFileText = sourceText || sourceFile.getText();
@@ -75,7 +90,7 @@ export class SimpleImportAstParser implements AstParser {
                 case ts.SyntaxKind.ImportDeclaration:
                     const lines = this.getCodeLineNumbers(node, sourceFile);
                     importNodes.push({
-                        importDeclaration: (node as ts.ImportDeclaration),
+                        importDeclaration: node as ts.ImportDeclaration,
                         start: lines.importStartLine,
                         end: lines.importEndLine,
                         importComment: this.getComments(sourceFileText, node)
@@ -100,10 +115,12 @@ export class SimpleImportAstParser implements AstParser {
     }
 
     private getComments(sourceFileText: string, node: ts.Node) {
-        const leadingComments = (ts.getLeadingCommentRanges(sourceFileText, node.getFullStart()) || [])
-            .map(range => this.getComment(range, sourceFileText));
-        const trailingComments = (ts.getTrailingCommentRanges(sourceFileText, node.getEnd()) || [])
-            .map(range => this.getComment(range, sourceFileText));
+        const leadingComments = (
+            ts.getLeadingCommentRanges(sourceFileText, node.getFullStart()) || []
+        ).map((range) => this.getComment(range, sourceFileText));
+        const trailingComments = (
+            ts.getTrailingCommentRanges(sourceFileText, node.getEnd()) || []
+        ).map((range) => this.getComment(range, sourceFileText));
         return { leadingComments, trailingComments };
     }
 
@@ -124,22 +141,25 @@ export class SimpleImportAstParser implements AstParser {
     }
 
     private parseImport(importNode: ImportNode, sourceFile: ts.SourceFile): ImportElement {
-        const moduleSpecifierName = importNode.importDeclaration.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral
-            ? (importNode.importDeclaration.moduleSpecifier as ts.StringLiteral).text
-            : importNode.importDeclaration.moduleSpecifier.getFullText(sourceFile).trim();
+        const moduleSpecifierName =
+            importNode.importDeclaration.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral
+                ? (importNode.importDeclaration.moduleSpecifier as ts.StringLiteral).text
+                : importNode.importDeclaration.moduleSpecifier.getFullText(sourceFile).trim();
+        const importClause = importNode.importDeclaration.importClause;
         const result: ImportElement = {
             moduleSpecifierName: moduleSpecifierName,
             startPosition: importNode.start,
             endPosition: importNode.end,
             hasFromKeyWord: false,
+            isTypeOnly: false,
             namedBindings: [],
             importComment: importNode.importComment
         };
 
-        const importClause = importNode.importDeclaration.importClause;
         if (!importClause) {
             return result;
         }
+        result.isTypeOnly = importClause.isTypeOnly;
         if (importClause.name) {
             result.hasFromKeyWord = true;
             result.defaultImportName = importClause.name.text;
@@ -157,7 +177,7 @@ export class SimpleImportAstParser implements AstParser {
 
         if (importClause.namedBindings.kind === ts.SyntaxKind.NamedImports) {
             const nImport = importClause.namedBindings as ts.NamedImports;
-            nImport.elements.forEach(y => {
+            nImport.elements.forEach((y) => {
                 const propertyName = y.propertyName ? y.propertyName.text : y.name.text;
                 const aliasName = !y.propertyName ? null : y.name.text;
                 result.namedBindings.push({ aliasName: aliasName, name: propertyName });

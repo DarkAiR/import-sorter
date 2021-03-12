@@ -15,10 +15,10 @@ interface ImportCreatorTest {
     expected: string;
 }
 
-const createConfiguration = (partialConfig: ImportStringConfiguration) => Object.assign({}, defaultImportStringConfiguration, partialConfig);
+const createConfiguration = (partialConfig: ImportStringConfiguration) =>
+    Object.assign({}, defaultImportStringConfiguration, partialConfig);
 
 suite('Import Creator Tests', () => {
-
     const testCases: ImportCreatorTest[] = [
         {
             testName: 'test0',
@@ -37,6 +37,7 @@ suite('Import Creator Tests', () => {
                             startPosition: { line: 0, character: 0 },
                             endPosition: { line: 0, character: 53 },
                             hasFromKeyWord: true,
+                            isTypeOnly: false,
                             defaultImportName: 't',
                             namedBindings: [
                                 { name: 'B', aliasName: null },
@@ -47,12 +48,13 @@ suite('Import Creator Tests', () => {
                                 leadingComments: [],
                                 trailingComments: []
                             }
-                        }],
+                        }
+                    ],
                     numberOfEmptyLinesAfterGroup: 3,
                     customOrderRule: null
                 }
             ],
-            expected: "import t, {\n    B, a as cc, ac\n} from \'createString.ts\';"
+            expected: "import t, {\n    B, a as cc, ac\n} from 'createString.ts';"
         },
         {
             testName: 'test1 - trailing comma',
@@ -71,6 +73,7 @@ suite('Import Creator Tests', () => {
                             startPosition: { line: 0, character: 0 },
                             endPosition: { line: 0, character: 70 },
                             hasFromKeyWord: true,
+                            isTypeOnly: false,
                             namedBindings: [
                                 { name: 'ChangeDetectionStrategy', aliasName: null },
                                 { name: 'DebugElement', aliasName: null }
@@ -79,7 +82,8 @@ suite('Import Creator Tests', () => {
                                 leadingComments: [],
                                 trailingComments: []
                             }
-                        }],
+                        }
+                    ],
                     numberOfEmptyLinesAfterGroup: 0,
                     customOrderRule: null
                 }
@@ -103,6 +107,7 @@ suite('Import Creator Tests', () => {
                             startPosition: { line: 0, character: 0 },
                             endPosition: { line: 0, character: 70 },
                             hasFromKeyWord: true,
+                            isTypeOnly: false,
                             namedBindings: [
                                 { name: 'ChangeDetectionStrategy', aliasName: null },
                                 { name: 'DebugElement', aliasName: null }
@@ -111,12 +116,13 @@ suite('Import Creator Tests', () => {
                                 leadingComments: [],
                                 trailingComments: []
                             }
-                        }],
+                        }
+                    ],
                     numberOfEmptyLinesAfterGroup: 0,
                     customOrderRule: null
                 }
             ],
-            expected: "import {\n    ChangeDetectionStrategy, DebugElement\n} from \'@angular/core\';"
+            expected: "import {\n    ChangeDetectionStrategy, DebugElement\n} from '@angular/core';"
         },
         {
             testName: 'test3 - trailing comma',
@@ -135,6 +141,7 @@ suite('Import Creator Tests', () => {
                             startPosition: { line: 0, character: 0 },
                             endPosition: { line: 0, character: 70 },
                             hasFromKeyWord: true,
+                            isTypeOnly: false,
                             namedBindings: [
                                 { name: 'ChangeDetectionStrategy', aliasName: null },
                                 { name: 'DebugElement', aliasName: null }
@@ -143,7 +150,8 @@ suite('Import Creator Tests', () => {
                                 leadingComments: [],
                                 trailingComments: []
                             }
-                        }],
+                        }
+                    ],
                     numberOfEmptyLinesAfterGroup: 0,
                     customOrderRule: null
                 }
@@ -167,6 +175,7 @@ suite('Import Creator Tests', () => {
                             startPosition: { line: 0, character: 0 },
                             endPosition: { line: 0, character: 70 },
                             hasFromKeyWord: true,
+                            isTypeOnly: false,
                             namedBindings: [
                                 { name: 'ChangeDetectionStrategy', aliasName: null },
                                 { name: 'DebugElement', aliasName: null }
@@ -175,12 +184,14 @@ suite('Import Creator Tests', () => {
                                 leadingComments: [],
                                 trailingComments: []
                             }
-                        }],
+                        }
+                    ],
                     numberOfEmptyLinesAfterGroup: 0,
                     customOrderRule: null
                 }
             ],
-            expected: "import {\n    ChangeDetectionStrategy, DebugElement,\n} from \'@angular/core\';\n"
+            expected:
+                "import {\n    ChangeDetectionStrategy, DebugElement,\n} from '@angular/core';\n"
         },
         {
             testName: 'test5 - trailing comma',
@@ -199,6 +210,7 @@ suite('Import Creator Tests', () => {
                             startPosition: { line: 0, character: 0 },
                             endPosition: { line: 0, character: 70 },
                             hasFromKeyWord: true,
+                            isTypeOnly: false,
                             namedBindings: [
                                 { name: 'ChangeDetectionStrategy', aliasName: null },
                                 { name: 'DebugElement', aliasName: null }
@@ -207,7 +219,8 @@ suite('Import Creator Tests', () => {
                                 leadingComments: [],
                                 trailingComments: []
                             }
-                        }],
+                        }
+                    ],
                     numberOfEmptyLinesAfterGroup: 0,
                     customOrderRule: null
                 }
@@ -231,6 +244,7 @@ suite('Import Creator Tests', () => {
                             startPosition: { line: 0, character: 0 },
                             endPosition: { line: 0, character: 70 },
                             hasFromKeyWord: true,
+                            isTypeOnly: false,
                             namedBindings: [
                                 { name: 'ChangeDetectionStrategy', aliasName: null },
                                 { name: 'DebugElement', aliasName: null }
@@ -239,12 +253,14 @@ suite('Import Creator Tests', () => {
                                 leadingComments: [],
                                 trailingComments: []
                             }
-                        }],
+                        }
+                    ],
                     numberOfEmptyLinesAfterGroup: 0,
                     customOrderRule: null
                 }
             ],
-            expected: "import {\n    ChangeDetectionStrategy, DebugElement,\n} from \'@angular/core\';\n"
+            expected:
+                "import {\n    ChangeDetectionStrategy, DebugElement,\n} from '@angular/core';\n"
         },
         {
             testName: 'test7 - optional semi-colon',
@@ -263,6 +279,7 @@ suite('Import Creator Tests', () => {
                             startPosition: { line: 0, character: 0 },
                             endPosition: { line: 0, character: 70 },
                             hasFromKeyWord: true,
+                            isTypeOnly: false,
                             namedBindings: [
                                 { name: 'ChangeDetectionStrategy', aliasName: null },
                                 { name: 'DebugElement', aliasName: null }
@@ -271,7 +288,8 @@ suite('Import Creator Tests', () => {
                                 leadingComments: [],
                                 trailingComments: []
                             }
-                        }],
+                        }
+                    ],
                     numberOfEmptyLinesAfterGroup: 0,
                     customOrderRule: null
                 }
@@ -295,6 +313,7 @@ suite('Import Creator Tests', () => {
                             startPosition: { line: 0, character: 0 },
                             endPosition: { line: 0, character: 69 },
                             hasFromKeyWord: true,
+                            isTypeOnly: false,
                             namedBindings: [
                                 { name: 'ChangeDetectionStrategy', aliasName: null },
                                 { name: 'DebugElement', aliasName: null }
@@ -303,12 +322,14 @@ suite('Import Creator Tests', () => {
                                 leadingComments: [],
                                 trailingComments: []
                             }
-                        }],
+                        }
+                    ],
                     numberOfEmptyLinesAfterGroup: 0,
                     customOrderRule: null
                 }
             ],
-            expected: "import {\n    ChangeDetectionStrategy, DebugElement\n} from \'@angular/core\'\n"
+            expected:
+                "import {\n    ChangeDetectionStrategy, DebugElement\n} from '@angular/core'\n"
         },
         {
             testName: 'test9 - import string has 4 new lines',
@@ -327,6 +348,7 @@ suite('Import Creator Tests', () => {
                             startPosition: { line: 0, character: 0 },
                             endPosition: { line: 0, character: 40 },
                             hasFromKeyWord: true,
+                            isTypeOnly: false,
                             namedBindings: [
                                 { name: 'a', aliasName: null },
                                 { name: 'b', aliasName: null },
@@ -336,12 +358,41 @@ suite('Import Creator Tests', () => {
                                 leadingComments: [],
                                 trailingComments: []
                             }
-                        }],
+                        }
+                    ],
                     numberOfEmptyLinesAfterGroup: 0,
                     customOrderRule: null
                 }
             ],
-            expected: "import {\n    a, b,\n    c\n} from \'@angular/core\';"
+            expected: "import {\n    a, b,\n    c\n} from '@angular/core';"
+        },
+        {
+            testName: 'test10 - import string is type only',
+            config: createConfiguration({} as ImportStringConfiguration),
+            elementGroups: [
+                {
+                    elements: [
+                        {
+                            moduleSpecifierName: 'foo',
+                            startPosition: { line: 0, character: 0 },
+                            endPosition: { line: 0, character: 40 },
+                            hasFromKeyWord: true,
+                            isTypeOnly: true,
+                            namedBindings: [
+                                { name: 'a', aliasName: null },
+                                { name: 'b', aliasName: null }
+                            ],
+                            importComment: {
+                                leadingComments: [],
+                                trailingComments: []
+                            }
+                        }
+                    ],
+                    numberOfEmptyLinesAfterGroup: 0,
+                    customOrderRule: null
+                }
+            ],
+            expected: "import type { a, b } from 'foo';\n"
         }
     ];
 
@@ -358,7 +409,12 @@ suite('Import Creator Tests', () => {
         });
     };
 
-    testCases.forEach(testElement => {
-        importCreatorTest(testElement.testName, testElement.config, testElement.elementGroups, testElement.expected);
+    testCases.forEach((testElement) => {
+        importCreatorTest(
+            testElement.testName,
+            testElement.config,
+            testElement.elementGroups,
+            testElement.expected
+        );
     });
 });
