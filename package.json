@@ -1,16 +1,22 @@
 {
-  "name": "@maikudou/import-sorter",
+  "name": "@darkair/import-sorter",
   "displayName": "TypeScript Import Sorter",
   "description": "Extension sorts TypeScript imports according to the configuration provided. The configuration defaults follow ESLint sort-imports rule. Based on SoominHan/import-sorter",
   "icon": "assets/icons/import-sorter.png",
-  "version": "4.0.4",
-  "publisher": "maikudou",
+  "version": "4.0.5",
+  "author": "maikudou",
+  "contributors": [
+    {
+      "name": "Dmitry DarkAiR Romanov",
+      "url": "https://github.com/DarkAiR"
+    }
+  ],
   "engines": {
     "vscode": "^1.33.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maikudou/import-sorter.git"
+    "url": "git+https://github.com/DarkAiR/import-sorter.git"
   },
   "license": "SEE LICENSE IN LICENSE",
   "categories": [
@@ -36,7 +42,9 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "postinstall": "./after-install.sh",
+    "postinstall": "run-script-os",
+    "postinstall:win32": "after-install.sh",
+    "postinstall:default": "./after-install.sh",
     "test": "npm run compile && node ./node_modules/vscode/bin/test",
     "clean": "rimraf -- node_modules coverage out",
     "lint": "tslint src/**/*.ts",
@@ -59,10 +67,11 @@
     "mocha": "^8.3.0",
     "rollup": "^2.40.0",
     "rollup-plugin-typescript": "^1.0.1",
+    "run-script-os": "^1.1.6",
     "tslint": "^5.8.0",
+    "typescript": "~4.1.2",
     "vscode": "^1.1.21",
-    "vscode-nls": "^2.0.2",
-    "typescript": "~4.1.2"
+    "vscode-nls": "^2.0.2"
   },
   "peerDependencies": {
     "typescript": ">=3.5.3"
@@ -297,6 +306,5 @@
   "homepage": "https://github.com/maikudou/import-sorter#readme",
   "directories": {
     "test": "test"
-  },
-  "author": ""
+  }
 }
