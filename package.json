@@ -3,7 +3,7 @@
   "displayName": "TypeScript Import Sorter",
   "description": "Extension sorts TypeScript imports according to the configuration provided. The configuration defaults follow ESLint sort-imports rule. Based on SoominHan/import-sorter",
   "icon": "assets/icons/import-sorter.png",
-  "version": "4.0.6",
+  "version": "4.0.7",
   "author": "maikudou",
   "contributors": [
     {
@@ -42,7 +42,9 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "postinstall": "after-install.sh",
+    "postinstall": "run-script-os",
+    "postinstall:win32": "after-install.sh",
+    "postinstall:default": "./after-install.sh",
     "test": "npm run compile && node ./node_modules/vscode/bin/test",
     "clean": "rimraf -- node_modules coverage out",
     "lint": "tslint src/**/*.ts",
@@ -54,6 +56,7 @@
   "dependencies": {
     "glob": "^7.1.6",
     "lodash": "^4.17.21",
+    "run-script-os": "^1.1.6",
     "rxjs": "^6.5.3"
   },
   "devDependencies": {
